@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediCare+ | Doctor Appointment Booking</title>
+  <meta name="description" content="Book doctor appointments instantly via WhatsApp." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f6ff;
+      color: #1a2a4a;
+      line-height: 1.6;
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── VARIABLES ── */
+    :root {
+      --blue:      #1a56db;
+      --blue-dark: #0f3460;
+      --blue-light:#e8f0fe;
+      --green:     #25D366;
+      --white:     #ffffff;
+      --gray:      #64748b;
+      --border:    #dbeafe;
+      --shadow:    0 4px 24px rgba(26,86,219,0.10);
+      --radius:    16px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--blue-dark);
+      padding: 0 24px;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--white);
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .nav-logo .cross {
+      width: 36px; height: 36px;
+      background: var(--blue);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: #fff;
+    }
+    .nav-links { display: flex; gap: 6px; }
+    .nav-links a {
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 8px;
+      transition: all .2s;
+    }
+    .nav-links a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .nav-cta {
+      background: var(--green);
+      color: #fff !important;
+      border-radius: 9px !important;
+      padding: 8px 16px !important;
+    }
+    .hamburger {
+      display: none;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 26px;
+      cursor: pointer;
+    }
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--blue-dark);
+      padding: 8px 0 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: #94a3b8;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .mobile-menu a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, #1a56db 100%);
+      padding: 64px 24px 56px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.06) 0%, transparent 60%),
+                  radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #bfdbfe;
+      padding: 5px 16px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      color: #fff;
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .hero h1 span { color: #93c5fd; }
+    .hero p {
+      color: #bfdbfe;
+      font-size: clamp(14px, 2vw, 17px);
+      max-width: 480px;
+      margin: 0 auto 28px;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    .stat {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 14px 22px;
+      text-align: center;
+      min-width: 80px;
+    }
+    .stat-num { color: #93c5fd; font-size: 24px; font-weight: 900; }
+    .stat-lbl { color: #bfdbfe; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    /* ── SECTION ── */
+    section { padding: 56px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-title { font-size: clamp(20px, 3vw, 28px); font-weight: 800; margin-bottom: 6px; }
+    .section-sub { color: var(--gray); margin-bottom: 36px; font-size: 14px; }
+
+    /* ── DOCTOR GRID ── */
+    .doctor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    /* ── DOCTOR CARD ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: transform .25s, box-shadow .25s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(26,86,219,0.15); }
+
+    .card-top {
+      background: linear-gradient(135deg, var(--blue-light), #dbeafe);
+      padding: 24px 20px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      border-bottom: 3px solid var(--blue);
+    }
+    .doc-photo {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--white);
+      box-shadow: 0 4px 14px rgba(26,86,219,0.2);
+      flex-shrink: 0;
+    }
+    .doc-photo-fallback {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 28px; font-weight: 800;
+      border: 3px solid var(--white);
+      box-shadow: 0 4px 14px rgba(26,86,219,0.2);
+      flex-shrink: 0;
+    }
+    .doc-info { flex: 1; min-width: 0; }
+    .doc-name { font-size: 16px; font-weight: 800; color: var(--blue-dark); margin-bottom: 4px; line-height: 1.3; }
+    .doc-spec {
+      display: inline-block;
+      background: var(--blue);
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .doc-rating { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; color: #f59e0b; }
+    .doc-rating span { color: var(--gray); font-weight: 500; }
+    .avail-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #dcfce7; color: #16a34a;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; margin-top: 6px;
+    }
+    .avail-dot { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; }
+
+    .card-body { padding: 18px 20px; }
+
+    .info-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13px;
+    }
+    .info-row:last-of-type { border-bottom: none; }
+    .info-icon {
+      width: 32px; height: 32px;
+      background: var(--blue-light);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .info-text { flex: 1; }
+    .info-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .info-value { font-weight: 600; color: var(--blue-dark); }
+
+    .fee-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--blue-light);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin: 14px 0;
+    }
+    .fee-label { font-size: 12px; font-weight: 700; color: var(--gray); }
+    .fee-value { font-size: 18px; font-weight: 900; color: var(--blue); }
+
+    /* ── WHATSAPP BUTTON ── */
+    .wa-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 13px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+      text-decoration: none;
+    }
+    .wa-btn:hover {
+      background: #1ebe5d;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(37,211,102,0.45);
+    }
+    .wa-btn:active { transform: translateY(0); }
+    .wa-icon { font-size: 22px; }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      background: linear-gradient(135deg, var(--blue-dark), #1a56db);
+      padding: 56px 24px;
+    }
+    .how-inner { max-width: 1100px; margin: 0 auto; }
+    .how-section .section-title { color: #fff; }
+    .how-section .section-sub { color: #bfdbfe; }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .step {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .step-num {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .step-icon { font-size: 28px; margin-bottom: 10px; }
+    .step h3 { color: #fff; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .step p { color: #bfdbfe; font-size: 13px; line-height: 1.6; }
+
+    /* ── SPECIALTIES ── */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+    }
+    .spec-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 14px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .spec-card:hover { border-color: var(--blue); transform: translateY(-3px); }
+    .spec-card .spec-icon { font-size: 30px; margin-bottom: 8px; }
+    .spec-card .spec-name { font-size: 13px; font-weight: 700; color: var(--blue-dark); }
+
+    /* ── CONTACT ── */
+    .contact-strip {
+      background: #fff;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .contact-strip h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; color: var(--blue-dark); }
+    .contact-strip p { color: var(--gray); font-size: 14px; margin-bottom: 22px; }
+    .contact-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .contact-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 11px;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer; border: none; font-family: inherit;
+      transition: all .2s;
+    }
+    .btn-wa  { background: var(--green); color: #fff; box-shadow: 0 4px 14px rgba(37,211,102,0.3); }
+    .btn-call{ background: var(--blue);  color: #fff; box-shadow: 0 4px 14px rgba(26,86,219,0.25); }
+    .btn-wa:hover  { background: #1ebe5d; transform: translateY(-2px); }
+    .btn-call:hover{ background: var(--blue-dark); transform: translateY(-2px); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--blue-dark);
+      color: #94a3b8;
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 13px;
+    }
+    footer strong { color: #bfdbfe; }
+    footer .emergency { color: #f87171; font-weight: 700; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      width: 100%; max-width: 420px;
+      padding: 28px 24px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+      position: relative;
+      animation: popIn .25s ease;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: #f1f5f9; border: none; border-radius: 50%;
+      width: 32px; height: 32px; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .modal h3 { font-size: 19px; font-weight: 800; color: var(--blue-dark); margin-bottom: 6px; }
+    .modal p  { font-size: 13px; color: var(--gray); margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 11px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 14px;
+      font-family: inherit; background: #f8fafc;
+      outline: none; color: var(--blue-dark);
+      transition: border-color .2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--blue);
+    }
+    .form-group textarea { resize: vertical; min-height: 70px; }
+    .modal-wa-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px;
+      background: var(--green); color: #fff;
+      border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 800; cursor: pointer;
+      font-family: inherit; margin-top: 4px;
+      box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+      transition: all .2s;
+    }
+    .modal-wa-btn:hover { background: #1ebe5d; transform: translateY(-2px); }
+
+    /* ── TOAST ── */
+    .toast {
+      display: none;
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%);
+      background: #1a2a4a; color: #fff;
+      padding: 12px 22px; border-radius: 30px;
+      font-size: 13px; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 9999;
+      animation: fadeInUp .3s ease;
+    }
+    .toast.show { display: block; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translate(-50%, 12px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hamburger { display: block; }
+      .hero { padding: 48px 16px 40px; }
+      section { padding: 40px 16px; }
+      .doctor-grid { grid-template-columns: 1fr; }
+      .spec-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav>
+  <div class="nav-logo">
+    <div class="cross">✚</div>
+    MediCare<span style="color:#93c5fd">+</span>
+  </div>
+  <div class="nav-links">
+    <a href="#doctors">Doctors</a>
+    <a href="#how">How It Works</a>
+    <a href="#specialties">Specialties</a>
+    <a href="#contact" class="nav-cta">📲 Book Now</a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">☰</button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#doctors"     onclick="toggleMenu()">👨‍⚕️ Doctors</a>
+  <a href="#how"         onclick="toggleMenu()">📋 How It Works</a>
+  <a href="#specialties" onclick="toggleMenu()">🏥 Specialties</a>
+  <a href="#contact"     onclick="toggleMenu()">📲 Book Now</a>
+</div>
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🏥 Trusted Healthcare Since 1995</div>
+    <h1>Book Doctor Appointments<br/><span>Instantly via WhatsApp</span></h1>
+    <p>Choose your specialist, fill your details, and get confirmed in minutes — no app needed.</p>
+    <a href="#doctors" class="wa-btn" style="display:inline-flex;width:auto;padding:13px 28px;font-size:15px;">
+      <span class="wa-icon">📅</span> View Our Doctors
+    </a>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">12+</div><div class="stat-lbl">Doctors</div></div>
+      <div class="stat"><div class="stat-num">5K+</div><div class="stat-lbl">Patients</div></div>
+      <div class="stat"><div class="stat-num">98%</div><div class="stat-lbl">Satisfaction</div></div>
+      <div class="stat"><div class="stat-num">24/7</div><div class="stat-lbl">Emergency</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ DOCTORS ═══════════ -->
+<section id="doctors">
+  <div class="section-title">Our Doctors</div>
+  <div class="section-sub">Click "Book on WhatsApp" to confirm your appointment instantly</div>
+
+  <div class="doctor-grid" id="doctorGrid">
+    <!-- Cards injected by JS -->
+  </div>
+</section>
+
+<!-- ═══════════ HOW IT WORKS ═══════════ -->
+<div class="how-section" id="how">
+  <div class="how-inner">
+    <div class="section-title">How It Works</div>
+    <div class="section-sub">Book your appointment in 3 simple steps</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">👨‍⚕️</div>
+        <div class="step-num">1</div>
+        <h3>Choose Doctor</h3>
+        <p>Browse our specialists and pick the right one for your needs.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">📝</div>
+        <div class="step-num">2</div>
+        <h3>Fill Details</h3>
+        <p>Enter your name, phone, preferred date and symptoms briefly.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">📲</div>
+        <div class="step-num">3</div>
+        <h3>WhatsApp Opens</h3>
+        <p>A pre-filled WhatsApp message is ready. Just tap Send!</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">✅</div>
+        <div class="step-num">4</div>
+        <h3>Get Confirmed</h3>
+        <p>Our team confirms your slot and sends you a reminder.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SPECIALTIES ═══════════ -->
+<section id="specialties">
+  <div class="section-title">Our Specialties</div>
+  <div class="section-sub">Comprehensive care across all departments</div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-icon">❤️</div><div class="spec-name">Cardiology</div></div>
+    <div class="spec-card"><div class="spec-icon">🧠</div><div class="spec-name">Neurology</div></div>
+    <div class="spec-card"><div class="spec-icon">👶</div><div class="spec-name">Pediatrics</div></div>
+    <div class="spec-card"><div class="spec-icon">🦴</div><div class="spec-name">Orthopedics</div></div>
+    <div class="spec-card"><div class="spec-icon">🔬</div><div class="spec-name">Dermatology</div></div>
+    <div class="spec-card"><div class="spec-icon">👁️</div><div class="spec-name">Ophthalmology</div></div>
+    <div class="spec-card"><div class="spec-icon">🦷</div><div class="spec-name">Dental</div></div>
+    <div class="spec-card"><div class="spec-icon">💊</div><div class="spec-name">General</div></div>
+  </div>
+</section>
+
+<!-- ═══════════ CONTACT ═══════════ -->
+<div class="contact-strip" id="contact">
+  <h2>Need Help? Talk to Us Directly</h2>
+  <p>Our team is available 9 AM – 8 PM · Emergency line open 24/7</p>
+  <div class="contact-btns">
+    <a href="https://wa.me/919876543210?text=Hello%20MediCare%2B%2C%20I%20need%20help%20with%20an%20appointment."
+       target="_blank" class="contact-btn btn-wa">
+      📲 WhatsApp Us
+    </a>
+    <a href="tel:+919876543210" class="contact-btn btn-call">
+      📞 Call Now
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>
+  <div style="margin-bottom:6px;">
+    <strong>MediCare+ Advanced Healthcare</strong>
+  </div>
+  <div>
+    123 Health Avenue, Chennai, Tamil Nadu 600001 &nbsp;|&nbsp;
+    Emergency: <span class="emergency">911</span> &nbsp;|&nbsp;
+    Helpline: <strong>1-800-MEDICARE</strong>
+  </div>
+  <div style="margin-top:10px;font-size:11px;color:#64748b;">
+    © 2026 MediCare+ · Built with ❤️ for better healthcare
+  </div>
+</footer>
+
+<!-- ═══════════ BOOKING MODAL ═══════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div style="font-size:36px;margin-bottom:10px;" id="modalEmoji">📅</div>
+    <h3 id="modalTitle">Book Appointment</h3>
+    <p id="modalSub">Fill details and we'll open WhatsApp for you.</p>
+
+    <div class="form-group">
+      <label>Your Name *</label>
+      <input type="text" id="patientName" placeholder="e.g. Ravi Kumar" />
+    </div>
+    <div class="form-group">
+      <label>Phone Number *</label>
+      <input type="tel" id="patientPhone" placeholder="e.g. 9876543210" />
+    </div>
+    <div class="form-group">
+      <label>Preferred Date</label>
+      <input type="date" id="prefDate" />
+    </div>
+    <div class="form-group">
+      <label>Preferred Time Slot</label>
+      <select id="prefSlot">
+        <option value="">-- Select slot --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Symptoms / Reason (optional)</label>
+      <textarea id="symptoms" placeholder="Brief description of your concern…"></textarea>
+    </div>
+
+    <button class="modal-wa-btn" onclick="sendWhatsApp()">
+      <span style="font-size:22px;">📲</span> Book on WhatsApp
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div class="toast" id="toast">✅ Opening WhatsApp…</div>
+
+<!-- ═══════════ JS ═══════════ -->
+<script>
+  /* ─── DOCTOR DATA ─── */
+  /* 
+    HOW TO CUSTOMIZE:
+    - Replace "photo" with a real image URL or base64
+    - Replace "wa" with the doctor's actual WhatsApp number (country code + number)
+    - Update name, specialty, address, timing, fee as needed
+  */
+  const DOCTORS = [
+    {
+      name:      "Dr. Sophia Reynolds",
+      specialty: "Cardiologist",
+      photo:     "https://randomuser.me/api/portraits/women/44.jpg",
+      rating:    4.9,
+      experience:"15 Years",
+      address:   "No. 12, Anna Salai, Chennai – 600002",
+      timing:    "Mon–Sat: 9:00 AM – 1:00 PM",
+      fee:       "₹500",
+      wa:        "919876543210",
+      slots:     ["09:00 AM","10:00 AM","11:00 AM","12:00 PM"],
+      lang:      "English, Tamil",
+      tag:       "⭐ Top Rated",
+    },
+    {
+      name:      "Dr. Marcus Chen",
+      specialty: "Neurologist",
+      photo:     "https://randomuser.me/api/portraits/men/32.jpg",
+      rating:    4.8,
+      experience:"12 Years",
+      address:   "45, Poonamallee High Rd, Chennai – 600010",
+      timing:    "Mon–Fri: 10:00 AM – 5:00 PM",
+      fee:       "₹600",
+      wa:        "919876543211",
+      slots:     ["10:00 AM","11:30 AM","02:00 PM","03:30 PM"],
+      lang:      "English, Hindi",
+      tag:       "🧠 Brain Specialist",
+    },
+    {
+      name:      "Dr. Amara Osei",
+      specialty: "Pediatrician",
+      photo:     "https://randomuser.me/api/portraits/women/68.jpg",
+      rating:    4.9,
+      experience:"10 Years",
+      address:   "78, T. Nagar, Chennai – 600017",
+      timing:    "Mon–Sat: 8:00 AM – 12:00 PM",
+      fee:       "₹400",
+      wa:        "919876543212",
+      slots:     ["08:00 AM","09:30 AM","10:30 AM","11:30 AM"],
+      lang:      "English, Tamil, French",
+      tag:       "👶 Child Specialist",
+    },
+    {
+      name:      "Dr. Priya Sharma",
+      specialty: "Dermatologist",
+      photo:     "https://randomuser.me/api/portraits/women/21.jpg",
+      rating:    4.8,
+      experience:"8 Years",
+      address:   "22, Velachery Main Rd, Chennai – 600042",
+      timing:    "Tue–Sun: 11:00 AM – 6:00 PM",
+      fee:       "₹450",
+      wa:        "919876543213",
+      slots:     ["11:00 AM","12:30 PM","02:30 PM","04:00 PM","05:30 PM"],
+      lang:      "English, Hindi, Tamil",
+      tag:       "🔬 Skin Expert",
+    },
+    {
+      name:      "Dr. Julian Marte",
+      specialty: "Orthopedic Surgeon",
+      photo:     "https://randomuser.me/api/portraits/men/55.jpg",
+      rating:    4.7,
+      experience:"18 Years",
+      address:   "5, Adyar Bridge Rd, Chennai – 600020",
+      timing:    "Mon–Fri: 9:00 AM – 3:00 PM",
+      fee:       "₹700",
+      wa:        "919876543214",
+      slots:     ["09:00 AM","10:30 AM","01:00 PM","02:30 PM"],
+      lang:      "English",
+      tag:       "🦴 Bone & Joint",
+    },
+    {
+      name:      "Dr. Ethan Brooks",
+      specialty: "General Physician",
+      photo:     "https://randomuser.me/api/portraits/men/11.jpg",
+      rating:    4.9,
+      experience:"20 Years",
+      address:   "101, Mount Road, Chennai – 600006",
+      timing:    "Mon–Sat: 8:00 AM – 8:00 PM",
+      fee:       "₹300",
+      wa:        "919876543215",
+      slots:     ["08:00 AM","09:00 AM","10:00 AM","11:00 AM","02:00 PM","04:00 PM","06:00 PM"],
+      lang:      "English, Tamil",
+      tag:       "💊 Walk-ins Welcome",
+    },
+  ];
+
+  /* ─── STATE ─── */
+  let activeDoctor = null;
+
+  /* ─── RENDER CARDS ─── */
+  function renderDoctors() {
+    const grid = document.getElementById('doctorGrid');
+    grid.innerHTML = DOCTORS.map((doc, i) => `
+      <div class="card">
+        <div class="card-top">
+          <img
+            class="doc-photo"
+            src="${doc.photo}"
+            alt="${doc.name}"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+          />
+          <div class="doc-photo-fallback" style="display:none;">${doc.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div>
+          <div class="doc-info">
+            <div class="doc-name">${doc.name}</div>
+            <span class="doc-spec">${doc.specialty}</span>
+            <div class="doc-rating">
+              ${'★'.repeat(Math.floor(doc.rating))} ${doc.rating}
+              <span>· ${doc.experience}</span>
+            </div>
+            <div class="avail-badge">
+              <div class="avail-dot"></div> Available Today
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <div class="info-icon">🕐</div>
+            <div class="info-text">
+              <div class="info-label">Timing</div>
+              <div class="info-value">${doc.timing}</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">📍</div>
+            <div class="info-text">
+              <div class="info-label">Address</div>
+              <div class="info-value">${doc.address}</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">🌐</div>
+            <div class="info-text">
+              <div class="info-label">Languages</div>
+              <div class="info-value">${doc.lang}</div>
+            </div>
+          </div>
+          <div class="fee-row">
+            <span class="fee-label">Consultation Fee</span>
+            <span class="fee-value">${doc.fee}</span>
+          </div>
+          <span style="
+            display:inline-block;
+            background:#eff6ff;
+            color:#1a56db;
+            font-size:11px;
+            font-weight:700;
+            padding:3px 10px;
+            border-radius:20px;
+            margin-bottom:12px;
+          ">${doc.tag}</span>
+          <button class="wa-btn" onclick="openModal(${i})">
+            <span class="wa-icon">📲</span>
+            Book on WhatsApp
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ─── MODAL ─── */
+  function openModal(index) {
+    activeDoctor = DOCTORS[index];
+
+    document.getElementById('modalTitle').textContent = `Book with ${activeDoctor.name}`;
+    document.getElementById('modalSub').textContent   = `${activeDoctor.specialty} · ${activeDoctor.fee} · ${activeDoctor.timing}`;
+
+    // Populate slots
+    const slotEl = document.getElementById('prefSlot');
+    slotEl.innerHTML = '<option value="">-- Select slot --</option>';
+    activeDoctor.slots.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s; o.textContent = s;
+      slotEl.appendChild(o);
+    });
+
+    // Set min date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('prefDate').min = today;
+
+    document.getElementById('modalOverlay').classList.add('open');
+    document.getElementById('patientName').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    activeDoctor = null;
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  /* ─── SEND WHATSAPP ─── */
+  function sendWhatsApp() {
+    const name     = document.getElementById('patientName').value.trim();
+    const phone    = document.getElementById('patientPhone').value.trim();
+    const date     = document.getElementById('prefDate').value;
+    const slot     = document.getElementById('prefSlot').value;
+    const symptoms = document.getElementById('symptoms').value.trim();
+
+    if (!name) { alert('Please enter your name.'); document.getElementById('patientName').focus(); return; }
+    if (!phone || phone.length < 7) { alert('Please enter a valid phone number.'); document.getElementById('patientPhone').focus(); return; }
+
+    const doc   = activeDoctor;
+    const dateStr = date ? new Date(date).toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' }) : 'Flexible';
+    const slotStr = slot || 'Any available slot';
+
+    const msg = [
+      `🏥 *MediCare+ Appointment Request*`,
+      ``,
+      `👨‍⚕️ *Doctor:* ${doc.name}`,
+      `🩺 *Specialty:* ${doc.specialty}`,
+      ``,
+      `👤 *Patient Name:* ${name}`,
+      `📞 *Phone:* ${phone}`,
+      `📅 *Preferred Date:* ${dateStr}`,
+      `🕐 *Preferred Slot:* ${slotStr}`,
+      `💊 *Symptoms/Reason:* ${symptoms || 'Not specified'}`,
+      ``,
+      `📍 *Clinic:* ${doc.address}`,
+      `💰 *Consultation Fee:* ${doc.fee}`,
+      ``,
+      `Please confirm my appointment. Thank you! 🙏`,
+    ].join('\n');
+
+    const url = `https://wa.me/${doc.wa}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+
+    showToast('✅ Opening WhatsApp…');
+    closeModal();
+  }
+
+  /* ─── TOAST ─── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ─── NAV ─── */
+  function toggleMenu() {
+    const m = document.getElementById('mobileMenu');
+    const h = document.querySelector('.hamburger');
+    const open = m.classList.toggle('open');
+    h.textContent = open ? '✕' : '☰';
+  }
+
+  /* ─── KEYBOARD ESC ─── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  /* ─── INIT ─── */
+  renderDoctors();
+</script>
+
+</body>
+</html>
